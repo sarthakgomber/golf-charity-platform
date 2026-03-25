@@ -1,10 +1,22 @@
-// backend/src/routes/scoreRoutes.js
-const express = require('express');
-const router = express.Router();
-const { protect } = require('../middleware/authMiddleware');
-const { getUserScores, addUserScores } = require('../controllers/scoreController');
+// src/routes/scoreRoutes.js
+const express = require('express')
+const router = express.Router()
+const { protect } = require('../middleware/authMiddleware')
+const { admin } = require('../middleware/authMiddleware')
+const { requireSubscription } = require('../middleware/subscriptionMiddleware')
+const {
+  getUserScores,
+  addScore,
+  adminUpdateScore,
+  adminAddScore,
+} = require('../controllers/scoreController')
 
-router.get('/', protect, getUserScores);
-router.post('/', protect, addUserScores);
+// User routes — subscription required to add scores
+router.get('/',                    protect, getUserScores)
+router.post('/',                   protect, requireSubscription, addScore)
 
-module.exports = router;
+// Admin routes
+router.post('/admin/:userId',      protect, admin, adminAddScore)
+router.put('/:userId/:scoreId',    protect, admin, adminUpdateScore)
+
+module.exports = router
